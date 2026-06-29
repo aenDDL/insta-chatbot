@@ -1,0 +1,95 @@
+exclude = [
+    "alembic",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+line-length = 88
+indent-width = 4
+target-version = "py312"
+src = ["app"]
+
+
+[lint]
+select = ["ALL"]
+preview = true
+ignore = [
+    "ANN204",  # Missing return type annotation for special method `__init__`
+    "ASYNC119",#Yield in context manager in async generator may not trigger cleanup
+    "COM812",  # missing-trailing-comma
+    "CPY001",  # Missing copyright notice
+    "D100",    # Missing docstring in public module
+    "D101",    # Missing docstring in public class
+    "D102",    # Missing docstring in public method
+    "D103",    # Missing docstring in public function
+    "D104",    # Missing docstring in public package
+    "D105",    # Missing docstring in magic method
+    "D107",    # Missing docstring in `__init__`
+    "D203",    # blank line required before class docstring
+    "D211",    # no-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
+    "EM101",   # raw-string-in-exception
+    "FIX002",  # line-contains-todo
+    "ISC001",  # Conflicts with formatter
+    "RUF075",  # Context manager does not catch exceptions
+    "TD002",   # Missing author in TODO
+    "TD003",   # missing-todo-link
+    "TRY003",  # raise-vanilla-args
+]
+
+[lint.isort]
+known-first-party = ["app"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+
+[lint.per-file-ignores]
+"{test_*.py,conftest.py}" = [
+    "ANN201",
+    "S105",
+    "S106",
+    "S101",
+    "ARG",
+    "FBT",
+    "PLR2004",
+    "S311",
+]
+"dependencies.py" = [
+    "PLR6301", # Method could be a function, class method, or static method
+]
+"agent.py" = [
+    "ANN201",  # missing type annotation for public function
+]
+"main.py" = [
+    "ANN201",  # missing type annotation for public function
+]

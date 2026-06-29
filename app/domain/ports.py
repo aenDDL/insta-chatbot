@@ -1,0 +1,9 @@
+from typing import Protocol
+
+
+class InstagramPort(Protocol):
+    async def send_message(self, text: str, username: str) -> None: ...
+
+    async def follow_user(self, user_id: int) -> None: ...
+
+    async def like_post(self, post_id: int) -> None: ...

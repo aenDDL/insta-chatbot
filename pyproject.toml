@@ -1,111 +1,34 @@
 [project]
-name = "insta-ai"
+name = "agentic-instagram"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "aiograpi",
-    "aiopath>=0.7.7",
+    "aiofiles>=25.1.0",
+    "aiograpi>=1.10.26",
     "aiosqlite>=0.22.1",
-    "beautifulsoup4>=4.14.3",
-    "fastapi[standard]>=0.128.7",
-    "pydantic-settings>=2.12.0",
-    "pyotp>=2.9.0",
-    "sqlalchemy>=2.0.46",
-    "xai-sdk>=1.6.1",
+    "alembic>=1.18.4",
+    "beautifulsoup4>=4.15.0",
+    "dishka>=1.10.1",
+    "fastapi[standard]>=0.136.1",
+    "psycopg[binary]>=3.3.4",
+    "pydantic-ai>=2.0.0",
+    "pyotp>=2.10.0",
+    "sqlalchemy>=2.0.49",
+    "xai-sdk>=1.17.0",
 ]
-
 [dependency-groups]
 dev = [
+    "dotenv>=0.9.9",
     "pytest>=9.0.2",
-    "pytest-mock>=3.15.1",
+    "pytest-asyncio>=1.4.0",
 ]
 lint = [
-    "ruff>=0.15.7",
+    "ruff>=0.15.16",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = "."
-
-
-[tool.ruff]
-src = ["app"]
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
-]
-line-length = 88
-indent-width = 4
-target-version = "py312"
-
-[tool.ruff.lint]
-select = ["ALL"]
-preview = true
-ignore = [
-    "ANN201", 
-    "ANN202", 
-    "D102",
-    "D107",
-    "TC002",
-    "COM812",  # missing-trailing-comma (often conflicts with formatter)
-    "CPY001",  # Missing copyright notice
-    "D100",    # Missing docstring in public module
-    "D101",    # Missing docstring in public class
-    "D103",    # Missing docstring in public function
-    "D104",    # Missing docstring in public package
-    "D203",    # blank line required before class docstring
-    "D211",    # no-blank-line-before-class
-    "D213",    # multi-line-summary-second-line
-    "EM101",   # raw-string-in-exception
-    "FIX002",  # line-contains-todo
-    "ISC001",  # Conflicts with formatter
-    "PLR0904", # Too many public methods (> 20)
-    "TD002",   # Missing author in TODO
-    "TD003",   # missing-todo-link
-    "TRY003",  # raise-vanilla-args
-]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-docstring-code-format = true
-docstring-code-line-length = "dynamic"
-
-[tool.uv.sources]
-aiograpi = { git = "https://github.com/subzeroid/aiograpi.git" }
-
-[tool.ruff.lint.per-file-ignores]
-"test_*.py" = [
-    "S101",    # asserts allowed in tests...
-    "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
-    "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
-    "PLR2004", # Magic value used in comparison, ...
-    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
-]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
