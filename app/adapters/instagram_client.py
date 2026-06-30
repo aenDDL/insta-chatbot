@@ -7,6 +7,13 @@ from aiograpi import Client
 from app.domain.errors import UnauthorizedError
 
 
+@dataclass(frozen=True)
+class Credentials:
+    login: str
+    password: str
+    secret: str | None
+
+
 def catch_error(func):  # noqa: ANN001, ANN201
     @functools.wraps(func)
     async def wrapper(self, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
@@ -21,6 +28,37 @@ def catch_error(func):  # noqa: ANN001, ANN201
 @dataclass
 class InstagramClient:
     cl: Client
+    credentials: Credentials
+
+    def __post_init__(self) -> None:
+        self.cl.delay_range = [5, 7]
+
+    @catch_error
+    async def _login_with_session(self, session: dict) -> None:
+        self.cl.set_settings(session)
+        await self.cl.get_timeline_feed()
+
+    @catch_error
+    async def _login_with_credentials(self) -> dict:
+        await self.cl.login(self.credentials.login, self.credentials.password)
+        return self.cl.get_settings()
+
+    @catch_error
+    async def _login_with_2fa(self) -> dict:
+        code = pyotp.TOTP(self.credentials.secret)
+        await self.cl.login(
+            self.credentials.login,
+            self.credentials.password,
+            verification_code=code.now(),
+        )
+        return self.cl.get_settings()
+
+    async def login(self, session: dict | None) -> dict | None:
+        if session:
+            return await self._login_with_session(session)
+        if self.credentials.secret:
+            return await self._login_with_2fa()
+        return await self._login_with_credentials()
 
     @catch_error
     async def send_message(self, text: str, username: str) -> None:
@@ -34,48 +72,3 @@ class InstagramClient:
     @catch_error
     async def like_post(self, post_id: int) -> None:
         await self.cl.media_like(post_id)
-
-
-@dataclass
-class FakeInstagramClient:
-    cl: Client
-
-    @catch_error
-    async def send_message(self, text: str, username: str) -> None:
-        pass
-
-    @catch_error
-    async def follow_user(self, user_id: int) -> None:
-        pass
-
-    @catch_error
-    async def like_post(self, post_id: int) -> None:
-        pass
-
-
-@dataclass
-class InstagramAuth:
-    cl: Client
-
-    def __post_init__(self) -> None:
-        self.cl.delay_range = [5, 7]
-
-    @catch_error
-    async def login_with_session(self, session: dict) -> None:
-        self.cl.set_settings(session)
-        await self.cl.get_timeline_feed()
-
-    @catch_error
-    async def login_with_credentials(self, login: str, password: str) -> dict:
-        await self.cl.login(login, password)
-        return self.cl.get_settings()
-
-    @catch_error
-    async def login_with_2fa(self, login: str, password: str, secret: str) -> dict:
-        code = pyotp.TOTP(secret)
-        await self.cl.login(
-            login,
-            password,
-            verification_code=code.now(),
-        )
-        return self.cl.get_settings()

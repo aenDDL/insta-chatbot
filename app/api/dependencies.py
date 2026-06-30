@@ -5,11 +5,7 @@ from pydantic_ai.models.xai import XaiModel
 from pydantic_ai.providers.xai import XaiProvider
 
 from app.adapters.files import Files
-from app.adapters.instagram_auth import Credentials, InstagramLoginService
-from app.adapters.instagram_client import (
-    InstagramAuth,
-    InstagramClient,
-)
+from app.adapters.instagram_client import Credentials, InstagramClient
 from app.domain.agent import (
     AgentDependencies,
     AgentService,
@@ -17,12 +13,12 @@ from app.domain.agent import (
     like_post,
     send_message,
 )
-from app.domain.ports import InstagramPort
+from app.domain.ports import FilesPort, InstagramPort
 from app.infrastructure.config import Settings
 
 
 def provide_service() -> Provider:
-    service_provider = Provider(scope=Scope.APP)
+    service_provider = Provider(scope=Scope.SESSION)
     service_provider.provide(AgentDependencies)
     service_provider.provide(AgentService)
     return service_provider
@@ -33,7 +29,7 @@ class ProvideAdapters(Provider):
     def settings(self) -> Settings:
         return Settings()
 
-    @provide(scope=Scope.APP)
+    @provide(scope=Scope.APP, provides=FilesPort)
     def files(self, settings: Settings) -> Files:
         return Files(settings.session_file)
 
@@ -47,7 +43,7 @@ class ProvideXai(Provider):
     def xai_model(self, settings: Settings, xai_provider: XaiProvider) -> XaiModel:
         return XaiModel(settings.xai_model, provider=xai_provider)
 
-    @provide(scope=Scope.APP)
+    @provide(scope=Scope.SESSION)
     def xai_agent(self, model: XaiModel) -> Agent:
         return Agent(
             model,
@@ -56,21 +52,11 @@ class ProvideXai(Provider):
 
 
 class ProvideInstagram(Provider):
-    @provide(scope=Scope.APP)
+    @provide(scope=Scope.SESSION)
     def aiograpi(self) -> Client:
         return Client()
 
-    @provide(scope=Scope.APP)
-    def auth(self, cl: Client) -> InstagramAuth:
-        return InstagramAuth(cl)
-
-    @provide(scope=Scope.APP, provides=InstagramPort)
-    def client(self, cl: Client) -> InstagramClient:
-        return InstagramClient(cl)
-
-    @provide(scope=Scope.APP)
-    def login(
-        self, auth: InstagramAuth, settings: Settings, files: Files
-    ) -> InstagramLoginService:
+    @provide(scope=Scope.SESSION, provides=InstagramPort)
+    def client(self, cl: Client, settings: Settings) -> InstagramClient:
         credentials = Credentials(settings.login, settings.password, settings.secret)
-        return InstagramLoginService(auth, credentials, files)
+        return InstagramClient(cl, credentials)

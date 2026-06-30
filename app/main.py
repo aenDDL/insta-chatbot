@@ -4,7 +4,6 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
-from app.adapters.instagram_auth import InstagramLoginService
 from app.api.dependencies import (
     ProvideAdapters,
     ProvideInstagram,
@@ -19,9 +18,6 @@ setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with container() as c:
-        instagram = await c.get(InstagramLoginService)
-        await instagram.login()
     yield
     await app.state.dishka_container.close()
 

@@ -2,7 +2,7 @@ from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.templating import Jinja2Templates
 
-from app.domain.agent import AgentService, pass_to_agent
+from app.domain.agent import AgentService, stream_agent
 
 templates = Jinja2Templates(directory="templates")
 
@@ -23,5 +23,5 @@ async def agent_ws(
     await ws.accept()
     while True:
         prompt = await ws.receive_text()
-        async for chunk in pass_to_agent(service, prompt):
-            await ws.send_text(f"{chunk}")
+        async for chunk in stream_agent(service, prompt):
+            await ws.send_text(chunk)
